@@ -13,9 +13,51 @@ const queue = {
   staff: [],
 };
 app.use(cors());
-// app.get('/hi', (req, res) => {
-//   res.send('Hello World');
-// });
+
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/ordars', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const orderSchema = new mongoose.Schema({
+  studentName: String,
+  notes: String,
+  size: String,
+  coffee: String,
+  branch: String,
+
+});
+
+const orderModel = mongoose.model('ordars', orderSchema);
+
+class Order {
+  constructor(tickets) {
+    this.notes = tickets.img;
+    this.size = tickets.name;
+    this.coffee = tickets.level;
+    this.branch = tickets.branch
+
+  }
+}
+
+app.get('/admin', getOrderHandler);
+// app.delete('/deletOrder/:id', deleteOrderHandler);
+
+function getOrderHandler(req, res) {
+  const dataOrders = queue.data.map(ele => {
+    return new Order(ele);
+  })
+  res.send(dataOrders);
+  console.log(dataOrders);
+}
+
+// function deleteOrderHandler(req, res) {
+//   const id = req.params.id;
+//   orderModel.remove({ id: id }, (error, data) => {
+//     orderModel.find({}, (error, data2) => {
+//       res.send(data2)
+//     })
+//   })
+// }
+
 
 io.on('connection', (socket) => {
   // console.log('clie.nt connected', socket.id);
@@ -37,6 +79,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('claim', (payload) => {
+    console.log('tic', queue.tickets);
+    console.log('t', queue.staff);
     // when a TA claim the ticket we need to notify the student
     socket.to(payload.studentId).emit('claimed', { name: payload.name });
     queue.tickets = queue.tickets.filter((t) => t.id !== payload.id);
