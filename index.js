@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema({
   size: String,
   coffee: Array,
   branch: String,
-
+  socketId : String,
 });
 
 const orderModel = mongoose.model('ordars', orderSchema);
@@ -45,8 +45,8 @@ class Order {
     this.notes = ordars.notes;
     this.size = ordars.size;
     this.coffee = ordars.coffee;
-    this.branch = ordars.branch
-
+    this.branch = ordars.branch;
+    this.socketId = ordars.customerId 
   }
 }
 
@@ -99,8 +99,10 @@ io.on('connection', (socket) => {
   socket.on('createTicket', async (payload) => {
     // 2
     // console.log('ticket', payload);
-    // const ticketData = { ...payload, id: uuidv4(), socketId: socket.id };
-    const newOrders = new orderModel(payload);
+    
+    const ticketData = { ...payload, id: uuidv4(), socketId: socket.id };
+    const newOrders = new orderModel(ticketData);
+
     newOrders.save().then((result) => {
       queue.ordars.push(result);
       socket.in(staffRoom).emit('newTicket', queue.ordars);
@@ -113,7 +115,7 @@ io.on('connection', (socket) => {
 
   socket.on('claim', (payload) => {
     // console.log('tic', queue.ordars);
-    // console.log('t', queue.staff);
+    console.log('t', payload);
 
     socket.to(payload.customerId).emit('claimed', { name: payload.name });
     console.log('id', payload.customerId);
