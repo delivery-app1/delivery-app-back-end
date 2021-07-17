@@ -9,7 +9,7 @@ const staffRoom = 'staff';
 const { v4: uuidv4 } = require('uuid');
 
 const socketIo = require('socket.io');
-
+const serverUrl=process.env.MONGODB_URI || 'mongodb+srv://batool:1234@cluster0.bozmn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
 const io = socketIo(server, {
   cors: {
@@ -27,7 +27,7 @@ const queue = {
 app.use(cors());
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/ordars', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(serverUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const orderSchema = new mongoose.Schema({
   customerName: String,
