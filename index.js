@@ -117,7 +117,7 @@ io.on('connection', (socket) => {
     // console.log('tic', queue.ordars);
     console.log('t', payload);
 
-    socket.to(payload.customerId).emit('claimed', { name: payload.name });
+    socket.to(payload.customerId).emit('claimed', { name: payload.name, done:payload.done, price:payload.price  });
     console.log('id', payload.customerId);
     queue.ordars = queue.ordars.filter((t) => t.id !== payload.id);
   });
